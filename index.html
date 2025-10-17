@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Sevk Takip Sistemi</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #c41e3a 0%, #e8834f 50%, #d4af37 100%);
+            min-height: 100vh;
+            overflow: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .presentation-container {
+            width: 95%;
+            max-width: 1200px;
+            min-height: 90vh;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 32px 40px 20px;
+            position: relative;
+            overflow: auto;
+        }
+
+        .slide {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+            height: auto;
+        }
+
+        .slide.active {
+            display: flex;
+            opacity: 1;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(90vh - 110px);
+        }
+
+        .slide-title {
+            font-size: 2.8rem;
+            color: #b61a34;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            margin-bottom: 14px;
+            text-align: center;
+            animation: slideDown 0.8s ease;
+        }
+
+        .flow-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            background: linear-gradient(135deg, #ffffff 0%, #fff9f0 100%);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(196, 30, 58, 0.15);
+            border-left: 5px solid #c41e3a;
+            transform: translateX(-100%);
+            opacity: 0;
+        }
+
+        .flow-step.animate {
+            animation: slideIn 0.6s ease forwards;
+        }
+
+        @keyframes slideIn {
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .step-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #c41e3a 0%, #e84855 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            flex-shrink: 0;
+            box-shadow: 0 5px 15px rgba(196, 30, 58, 0.3);
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-size: 1.4em;
+            color: #333;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .step-description {
+            color: #666;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .arrow {
+            text-align: center;
+            font-size: 2.5em;
+            color: #c41e3a;
+            margin: -10px 0;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .controls {
+            position: absolute;
+            bottom: 16px;
+            right: 24px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            background: #c41e3a;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(196, 30, 58, 0.4);
+        }
+
+        .btn:hover {
+            background: #a01729;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(196, 30, 58, 0.5);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .slide-counter {
+            position: absolute;
+            bottom: 16px;
+            left: 24px;
+            color: #c41e3a;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+
+        /* PDF butonu */
+        .print-btn {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            padding: 10px 18px;
+            background: #374151;
+            color: #fff;
+            border: none;
+            border-radius: 999px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        /* Yazdırma (PDF) stilleri */
+        @media print {
+            @page { size: A4 landscape; margin: 0; }
+            html, body { background: white !important; }
+            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .presentation-container {
+                box-shadow: none;
+                border-radius: 0;
+                width: 100%;
+                max-width: 100%;
+                min-height: auto;
+                padding: 0;
+            }
+            .slide { display: block !important; opacity: 1 !important; height: auto; page-break-after: always; }
+            .flow-step { transform: none !important; opacity: 1 !important; }
+            .arrow { display: none !important; }
+            .controls, .slide-counter, .auto-play-btn, .print-btn { display: none !important; }
+        }
+
+        .intro-slide {
+            text-align: center;
+            padding-top: 32px;
+        }
+
+        .intro-subtitle {
+            font-size: 1rem;
+            color: #6b7280;
+            margin-top: 6px;
+            animation: fadeIn 1s ease 0.5s both;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .logo {
+            font-size: 5em;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .auto-play-btn {
+            margin-top: 22px;
+            padding: 12px 28px;
+            font-size: 0.95rem;
+            border-radius: 999px;
+            animation: fadeIn 1s ease 1s both;
+        }
+
+        .company-logo {
+            display: none;
+        }
+
+        .company-logo img {
+            display: none;
+        }
+
+        .intro-truck {
+            width: 420px;
+            height: auto;
+            margin-bottom: 18px;
+        }
+
+        .intro-company {
+            width: 300px;
+            height: auto;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .intro-company { width: 200px; }
+            .intro-truck { width: 300px; }
+            .slide-title { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        <button class="print-btn" onclick="window.print()">PDF Olarak İndir</button>
+        <!-- Company Logo -->
+        <div class="company-logo">
+            <img src="Logo.jpg" alt="Logo">
+        </div>
+
+        <!-- Slide 1: Intro -->
+        <div class="slide active intro-slide">
+            <img class="intro-company" src="Logo.jpg" alt="Logo">
+            <img class="intro-truck" src="TırTasarım.png" alt="Tır Tasarımı">
+            <h1 class="slide-title">WhatsApp Sevk Takip Sistemi</h1>
+            <p class="intro-subtitle">Otomatik İş Akışı Sunumu</p>
+            <button class="btn auto-play-btn" onclick="startAutoPlay()">▶ Sunumu Başlat</button>
+        </div>
+
+        <!-- Slide 2: Flow -->
+        <div class="slide">
+            <h2 class="slide-title">Sistem İş Akışı</h2>
+            <div class="flow-container">
+                <div class="flow-step" data-delay="0">
+                    <div class="step-icon">📧</div>
+                    <div class="step-content">
+                        <div class="step-title">1. Görev Bildirimi</div>
+                        <div class="step-description">Sürücü ve filo yöneticisine görev bildirimi Whatsapp üstünden gönderilir</div>
+                    </div>
+                </div>
+
+                <div class="arrow">↓</div>
+
+                <div class="flow-step" data-delay="800">
+                    <div class="step-icon">📱</div>
+                    <div class="step-content">
+                        <div class="step-title">2. Görev Onayı</div>
+                        <div class="step-description">Sürücü WhatsApp üzerinden görevi okur ve onaylar</div>
+                    </div>
+                </div>
+
+                <div class="arrow">↓</div>
+
+                <div class="flow-step" data-delay="1600">
+                    <div class="step-icon">🚚</div>
+                    <div class="step-content">
+                        <div class="step-title">3. Sevkiyat</div>
+                        <div class="step-description">Sürücü atanan sevkiyatı gerçekleştirir</div>
+                    </div>
+                </div>
+
+                <div class="arrow">↓</div>
+
+                <div class="flow-step" data-delay="2400">
+                    <div class="step-icon">⏰</div>
+                    <div class="step-content">
+                        <div class="step-title">4. Otomatik Hatırlatma</div>
+                        <div class="step-description">Sistem sürücüye belge yükleme uyarısı gönderir (8 saat ve 24 saat)</div>
+                    </div>
+                </div>
+
+                <div class="arrow">↓</div>
+
+                <div class="flow-step" data-delay="3200">
+                    <div class="step-icon">📸</div>
+                    <div class="step-content">
+                        <div class="step-title">5. Belge Paylaşımı</div>
+                        <div class="step-description">Sürücü teslim evrakı ve faturaları WhatsApp'tan resim olarak paylaşır</div>
+                    </div>
+                </div>
+
+                <div class="arrow">↓</div>
+
+                <div class="flow-step" data-delay="4000">
+                    <div class="step-icon">✅</div>
+                    <div class="step-content">
+                        <div class="step-title">6. Otomatik Yükleme</div>
+                        <div class="step-description">Veriler ana sisteme otomatik yüklenir ve operasyon ekibine bildirim gönderilir</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Benefits -->
+        <div class="slide">
+            <h2 class="slide-title">Sistem Avantajları</h2>
+            <div class="flow-container">
+                <div class="flow-step" data-delay="0">
+                    <div class="step-icon">⚡</div>
+                    <div class="step-content">
+                        <div class="step-title">Hız ve Verimlilik</div>
+                        <div class="step-description">Otomatik bildirimler ve hatırlatmalarla manuel işlemler ortadan kalkar</div>
+                    </div>
+                </div>
+
+                <div class="flow-step" data-delay="600">
+                    <div class="step-icon">🎯</div>
+                    <div class="step-content">
+                        <div class="step-title">Doğruluk</div>
+                        <div class="step-description">Otomatik sevk kodu tespiti ile hata oranı sıfıra yakın</div>
+                    </div>
+                </div>
+
+                <div class="flow-step" data-delay="1200">
+                    <div class="step-icon">📊</div>
+                    <div class="step-content">
+                        <div class="step-title">İzlenebilirlik</div>
+                        <div class="step-description">Tüm süreçler kayıt altında, anlık takip imkanı</div>
+                    </div>
+                </div>
+
+                <div class="flow-step" data-delay="1800">
+                    <div class="step-icon">💰</div>
+                    <div class="step-content">
+                        <div class="step-title">Maliyet Verimliliği</div>
+                        <div class="step-description">Günlük 70-1000 sevk işlenebilir, uygun maliyetler ile projelere kurulabilir</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide-counter"><span id="currentSlide">1</span> / <span id="totalSlides">3</span></div>
+
+        <div class="controls">
+            <button class="btn" id="prevBtn" onclick="previousSlide()">◀ Önceki</button>
+            <button class="btn" id="nextBtn" onclick="nextSlide()">Sonraki ▶</button>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        let animationTimeouts = [];
+
+        document.getElementById('totalSlides').textContent = totalSlides;
+
+        function showSlide(index) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            slides[index].classList.add('active');
+            
+            currentSlide = index;
+            document.getElementById('currentSlide').textContent = currentSlide + 1;
+
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+
+            // Clear any pending animations to keep correct order
+            animationTimeouts.forEach(t => clearTimeout(t));
+            animationTimeouts = [];
+
+            const flowSteps = slides[index].querySelectorAll('.flow-step');
+            flowSteps.forEach((step, i) => {
+                step.classList.remove('animate');
+                step.style.animationDelay = `${i * 450}ms`;
+                const t = setTimeout(() => {
+                    step.classList.add('animate');
+                }, 0);
+                animationTimeouts.push(t);
+            });
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                showSlide(currentSlide + 1);
+            }
+        }
+
+        function previousSlide() {
+            if (currentSlide > 0) {
+                showSlide(currentSlide - 1);
+            }
+        }
+
+        function startAutoPlay() {
+            showSlide(1);
+            
+            setTimeout(() => {
+                if (currentSlide === 1) {
+                    showSlide(2);
+                }
+            }, 5500);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') previousSlide();
+        });
+
+        showSlide(0);
+    </script>
+</body>
+</html>
