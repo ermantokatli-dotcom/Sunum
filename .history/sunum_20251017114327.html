@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Sevk Takip Sistemi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #c41e3a 0%, #e8834f 50%, #d4af37 100%);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .presentation-container {
+            width: 95%;
+            max-width: 1200px;
+            height: 90vh;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+            height: 100%;
+        }
+
+        .slide.active {
+            display: flex;
+            opacity: 1;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide-title {
+            font-size: 2.5em;
+            color: #c41e3a;
+            margin-bottom: 30px;
+            text-align: center;
+            animation: slideDown 0.8s ease;
+        }
+
+        .flow-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            background: linear-gradient(135deg, #ffffff 0%, #fff9f0 100%);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(196, 30, 58, 0.15);
+            border-left: 5px solid #c41e3a;
+            transform: translateX(-100%);
+            opacity: 0;
+        }
+
+        .flow-step.animate {
+            animation: slideIn 0.6s ease forwards;
+        }
+
+        @keyframes slideIn {
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .step-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #c41e3a 0%, #e84855 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            flex-shrink: 0;
+            box-shadow: 0 5px 15px rgba(196, 30, 58, 0.3);
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-size: 1.4em;
+            color: #333;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .step-description {
+            color: #666;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .arrow {
+            text-align: center;
+            font-size: 2.5em;
+            color: #c41e3a;
+            margin: -10px 0;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .controls {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            background: #c41e3a;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(196, 30, 58, 0.4);
+        }
+
+        .btn:hover {
+            background: #a01729;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(196, 30, 58, 0.5);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .slide-counter {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            color: #c41e3a;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+
+        .intro-slide {
+            text-align: center;
+        }
+
+        .intro-subtitle {
+            font-size: 1.5em;
+            color: #666;
+            margin-top: 20px;
+            animation: fadeIn 1s ease 0.5s both;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .logo {
+            font-size: 5em;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .auto-play-btn {
+            margin-top: 30px;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            animation: fadeIn 1s ease 1s both;
+        }
+
+        .company-logo {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            width: 120px;
+            height: auto;
+        }
+
+        .company-logo img {
+            width: 100%;
+            height: auto;
+            filter: drop-shadow(0 3px 10px rgba(0,0,0,0.15));
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        <!-- Company Logo -->
+        <div class="company-logo">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 180'%3E%3Cellipse cx='150' cy='90' rx='145' ry='85' fill='%23c41e3a'/%3E%3Ctext x='150' y='85' font-family='Arial,sans-serif' font-size='48' font-weight='bold' fill='white' text-anchor='middle'%3EDOĞUŞ%3C/text%3E%3Cpath d='M 45 115 Q 75 135 105 115 Q 135 95 150 100 Q 165 105 195 115 Q 225 125 255 115' stroke='white' stroke-width='4' fill='none'/%3E%3Cellipse cx='95' cy='135' rx='48' ry='28' fill='%23b8a074' transform='rotate(-15 95 135)'/%3E%3Cellipse cx='205' cy='135' rx='48' ry='28' fill='%23b8a074' transform='rotate(15 205 135)'/%3E%3Ccircle cx='150' cy='122' r='24' fill='%23ffd700'/%3E%3Ccircle cx='150' cy='122' r='16' fill='%23ffed4e'/%3E%3C/svg%3E" alt="DOĞUŞ">
+        </div>
+
+        <!-- Slide 1: Intro -->
+        <div class="slide active intro-slide">
+            <div class="logo">🚚</div>
+            <h1 class="slide-title">WhatsApp Sevk Takip Sistemi</h1>
+            <p class="intro-subtitle">Otomatik İş Akışı Sunumu</p>
+            <button class="btn auto-play-btn" onclick="startAutoPlay()">▶ Sunumu Başlat</button>
+        </div>
+
+        <!-- Slide 2: Flow -->
+        <div class="slide">
+            <h2 class="slide-title">Sistem İş Akışı</h2>
+            <div class="flow-container">
+                <div class="flow-step" data-delay="0">
+                    <div class="step-icon">📧</div>
+                    <div class="step-content">
+                        <div class="step-title">1. Görev Bildirimi</div>
+                        <div class="step-description">Sürücüye yazılım, e-mail ve WhatsApp ile otomatik görev bildirimi gönderilir</div>
+                    </div>
+                </div>
+
+                <div class="arrow">↓</div>
+
+                <div class="flow-step" data-delay="800">
+                    <div class="step-icon">📱</div>
+                    <div class="step-content">
+                        <div class="step-title">2. Görev Onayı</div>
+                        <div class="step-description">Sürücü WhatsApp üzerinden görevi okur ve onaylar</div>
+                    </div>
+                </div>
+
+                <div class="arrow">↓</div>
+
+                <div class="flow-step" data-delay="1600">
+                    <div class="step-icon">🚚</div>
+                    <div class="step-content">
+                        <div class="step-title">3. Sevkiyat</div>
+                        <div class="step-description">Sürücü atanan sevkiyatı gerçekleştirir</div>
+                    </div>
+                </div>
+
+                <div class="arrow">↓</div>
+
+                <div class="flow-step" data-delay="2400">
+                    <div class="step-icon">⏰</div>
+                    <div class="step-content">
+                        <div class="step-title">4. Otomatik Hatırlatma</div>
+                        <div class="step-description">Sistem sürücüye belge yükleme uyarısı gönderir (8 saat ve 24 saat)</div>
+                    </div>
+                </div>
+
+                <div class="arrow">↓</div>
+
+                <div class="flow-step" data-delay="3200">
+                    <div class="step-icon">📸</div>
+                    <div class="step-content">
+                        <div class="step-title">5. Belge Paylaşımı</div>
+                        <div class="step-description">Sürücü teslim evrakı ve faturaları WhatsApp'tan resim olarak paylaşır</div>
+                    </div>
+                </div>
+
+                <div class="arrow">↓</div>
+
+                <div class="flow-step" data-delay="4000">
+                    <div class="step-icon">✅</div>
+                    <div class="step-content">
+                        <div class="step-title">6. Otomatik Yükleme</div>
+                        <div class="step-description">Veriler ana sisteme otomatik yüklenir ve operasyon ekibine bildirim gönderilir</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Benefits -->
+        <div class="slide">
+            <h2 class="slide-title">Sistem Avantajları</h2>
+            <div class="flow-container">
+                <div class="flow-step" data-delay="0">
+                    <div class="step-icon">⚡</div>
+                    <div class="step-content">
+                        <div class="step-title">Hız ve Verimlilik</div>
+                        <div class="step-description">Otomatik bildirimler ve hatırlatmalarla manuel işlemler ortadan kalkar</div>
+                    </div>
+                </div>
+
+                <div class="flow-step" data-delay="600">
+                    <div class="step-icon">🎯</div>
+                    <div class="step-content">
+                        <div class="step-title">Doğruluk</div>
+                        <div class="step-description">Otomatik sevk kodu tespiti ile hata oranı sıfıra yakın</div>
+                    </div>
+                </div>
+
+                <div class="flow-step" data-delay="1200">
+                    <div class="step-icon">📊</div>
+                    <div class="step-content">
+                        <div class="step-title">İzlenebilirlik</div>
+                        <div class="step-description">Tüm süreçler kayıt altında, anlık takip imkanı</div>
+                    </div>
+                </div>
+
+                <div class="flow-step" data-delay="1800">
+                    <div class="step-icon">💰</div>
+                    <div class="step-content">
+                        <div class="step-title">Maliyet Verimliliği</div>
+                        <div class="step-description">Günlük 70-1000 sevk işlenebilir, yalnızca $5/ay sunucu maliyeti</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide-counter"><span id="currentSlide">1</span> / <span id="totalSlides">3</span></div>
+
+        <div class="controls">
+            <button class="btn" id="prevBtn" onclick="previousSlide()">◀ Önceki</button>
+            <button class="btn" id="nextBtn" onclick="nextSlide()">Sonraki ▶</button>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        document.getElementById('totalSlides').textContent = totalSlides;
+
+        function showSlide(index) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            slides[index].classList.add('active');
+            
+            currentSlide = index;
+            document.getElementById('currentSlide').textContent = currentSlide + 1;
+
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+
+            const flowSteps = slides[index].querySelectorAll('.flow-step');
+            flowSteps.forEach((step, i) => {
+                step.classList.remove('animate');
+                const delay = parseInt(step.dataset.delay) || (i * 400);
+                setTimeout(() => {
+                    step.classList.add('animate');
+                }, delay);
+            });
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                showSlide(currentSlide + 1);
+            }
+        }
+
+        function previousSlide() {
+            if (currentSlide > 0) {
+                showSlide(currentSlide - 1);
+            }
+        }
+
+        function startAutoPlay() {
+            showSlide(1);
+            
+            setTimeout(() => {
+                if (currentSlide === 1) {
+                    showSlide(2);
+                }
+            }, 5500);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') previousSlide();
+        });
+
+        showSlide(0);
+    </script>
+</body>
+</html>
