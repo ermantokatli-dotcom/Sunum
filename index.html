@@ -190,22 +190,6 @@
             font-weight: 600;
         }
 
-        /* PDF butonu */
-        .print-btn {
-            position: absolute;
-            top: 16px;
-            left: 16px;
-            padding: 10px 18px;
-            background: #374151;
-            color: #fff;
-            border: none;
-            border-radius: 999px;
-            cursor: pointer;
-            font-size: 0.95rem;
-            font-weight: 600;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        }
-
         /* Yazdırma (PDF) stilleri */
         @media print {
             @page { size: A4 landscape; margin: 0; }
@@ -222,7 +206,7 @@
             .slide { display: block !important; opacity: 1 !important; height: auto; page-break-after: always; }
             .flow-step { transform: none !important; opacity: 1 !important; }
             .arrow { display: none !important; }
-            .controls, .slide-counter, .auto-play-btn, .print-btn { display: none !important; }
+            .controls, .slide-counter, .auto-play-btn { display: none !important; }
         }
 
         .intro-slide {
@@ -290,7 +274,6 @@
 </head>
 <body>
     <div class="presentation-container">
-        <button class="print-btn" onclick="window.print()">PDF Olarak İndir</button>
         <!-- Company Logo -->
         <div class="company-logo">
             <img src="Logo.jpg" alt="Logo">
